@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 import time
 import pandas as pd
 from selenium.webdriver.common.action_chains import ActionChains
+import os
 
 # Setup WebDriver (replace with the path to your WebDriver)
 driver = webdriver.Chrome()
@@ -23,47 +24,55 @@ time.sleep(5)
 print("[ROWS LOAD FINISHED]")
 
 # Locate the table container
-table_container = driver.find_element(By.CLASS_NAME, 'interactive-grid')
+#table_container = driver.find_element(By.CLASS_NAME, 'interactive-grid')
 
-table_viewport_container = driver.find_element(By.CSS_SELECTOR, ".mid-viewport")
-last_height = driver.execute_script("return arguments[0].scrollHeight", table_viewport_container)
+table_container = driver.find_element(By.CSS_SELECTOR, ".mid-viewport")
+
+table_hight = driver.execute_script("return arguments[0].scrollHeight", table_container)
 
 data_rows = []
 
 print("[SCRAPE DATA START]")
 
+total_fetched = 0
+
 # Scroll until no more new data
 while True:
     # Extract data from current view
-    rows = table_container.find_elements(By.CSS_SELECTOR, "div.innerContainer div.row")  # Update this selector if necessary
+    rows = table_container.find_elements(By.CSS_SELECTOR, ".mid-viewport div.row")  # Update this selector if necessary
 
-    # Extract data from rows
-    for row in rows:
+    # Extract data from rows, skip the header row and since the scoll stops at last row so we skip it on n+1 iteration
+    for row in rows[1:]:
+        time.sleep(1)  # Adjust based on your connection speed and loading time
+
         columns = row.find_elements(By.CSS_SELECTOR, ".tablixAlignCenter")
         row_data = [column.text for column in columns]
-        if row_data not in data_rows:  # Only add new rows to avoid duplicates
-            print(f"[INSERT ROW DATA #{row_data[6]}]")
-            data_rows.append(row_data)
+        print(f"[INSERT ROW DATA #{row_data[6]} OF TOTAL {total_fetched}]")
+
+        total_fetched += 1
+
+        df = pd.DataFrame([row_data])
+        header = not os.path.exists('scraped_data.csv')
+        df.to_csv('scraped_data.csv', mode='a', index=False, header=header)
+
+    print(f"[SCROLLING STARTED]")
 
     # Scroll down to the bottom of the container
-    driver.execute_script(f"arguments[0].scrollTo(0, {last_height});", table_viewport_container)
+    #driver.execute_script(f"arguments[0].scrollTo(0, {table_hight});", table_container, table_container)
+    driver.execute_script("arguments[0].scrollIntoView();", rows[-1])
 
-    # Wait to load the page
     time.sleep(10)  # Adjust based on your connection speed and loading time
+
+    print(f"[SCROLLING FINISHED]")
 
     # Check if new rows are loaded by comparing number of rows before and after scroll
     new_rows = table_container.find_elements(By.CSS_SELECTOR, "table_viewport_container")
+
     if len(new_rows) == len(rows):
         # If no new rows are loaded, break the loop
         break
-    last_height = driver.execute_script("return arguments[0].scrollHeight", table_viewport_container)
 
 # Close the WebDriver
-    
 driver.quit()
-
-# Save data to a DataFrame and CSV
-df = pd.DataFrame(data_rows)
-df.to_csv('scraped_data.csv', index=False)
 
 print("Data scraped and saved to scraped_data.csv")
