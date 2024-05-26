@@ -5,39 +5,38 @@ import pandas as pd
 from selenium.webdriver.common.action_chains import ActionChains
 import os
 
-# Setup WebDriver (replace with the path to your WebDriver)
+
+DEFAULT_LOAD_WAIT_TIME = 8
+SHORT_LOAD_WAIT_TIME = 3
+
+CITY_DROPDOWN_INDEX = 3
+TYPE_OF_PROPERTY_DROPDOWN_INDEX = 4
+
 driver = webdriver.Chrome()
 
 print("[LOADING URL]")
 driver.get("https://app.powerbi.com/view?r=eyJrIjoiNGI5OWM4NzctMDExNS00ZTBhLWIxMmYtNzIyMTJmYTM4MzNjIiwidCI6IjMwN2E1MzQyLWU1ZjgtNDZiNS1hMTBlLTBmYzVhMGIzZTRjYSIsImMiOjl9")
-print("[LOADING URL FINISH]")
 
 print("[INITIAL LOAD WAIT]")
-time.sleep(8)
-print("[INITIAL LOAD FINISHED]")
+time.sleep(DEFAULT_LOAD_WAIT_TIME)
 
-# Open table tab of the data in the Power BI report
+# Open table tab of the data
 driver.find_element(By.CSS_SELECTOR, "#pvExplorationHost > div > div > exploration > div > explore-canvas > div > div.canvasFlexBox > div > div.displayArea.disableAnimations.fitToPage > div.visualContainerHost.visualContainerOutOfFocus > visual-container-repeat > visual-container-group:nth-child(2) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container-group:nth-child(5) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container-group:nth-child(2) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container:nth-child(2) > transform > div > div.visualContent > div > div > visual-modern").click()
 
-# slicer-restatement
+# Pick city from the dropdown
 drop_down_cities = driver.find_elements(By.CSS_SELECTOR, ".slicer-dropdown-menu")
-
-if len(drop_down_cities) >= 3:
-    drop_down_cities[3].click()
-    time.sleep(3)
+if len(drop_down_cities) >= CITY_DROPDOWN_INDEX:
+    drop_down_cities[CITY_DROPDOWN_INDEX].click()
+    time.sleep(SHORT_LOAD_WAIT_TIME)
     drop_down_cities_rows = driver.find_elements(By.CSS_SELECTOR, ".slicerItemContainer")
-    if len(drop_down_cities_rows) >= 4:
-        drop_down_cities_rows[4].click()
+    if len(drop_down_cities_rows) >= TYPE_OF_PROPERTY_DROPDOWN_INDEX:
+        drop_down_cities_rows[TYPE_OF_PROPERTY_DROPDOWN_INDEX].click()
 
-print("[ROWS LOAD WAIT]")
-time.sleep(5)
-print("[ROWS LOAD FINISHED]")
+print("[TABLE'S ROWS LOAD WAIT]")
+time.sleep(SHORT_LOAD_WAIT_TIME)
 
-# Locate the table container
-#table_container = driver.find_element(By.CLASS_NAME, 'interactive-grid')
-
+# Element of the table
 table_container = driver.find_element(By.CSS_SELECTOR, ".mid-viewport")
-
 data_rows = []
 
 print("[SCRAPE DATA START]")
