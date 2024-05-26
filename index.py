@@ -29,8 +29,6 @@ if len(drop_down_cities) >= 3:
     if len(drop_down_cities_rows) >= 4:
         drop_down_cities_rows[4].click()
 
-time.sleep(1000)
-
 print("[ROWS LOAD WAIT]")
 time.sleep(5)
 print("[ROWS LOAD FINISHED]")
@@ -63,7 +61,7 @@ for row in rows:
 
 driver.execute_script("arguments[0].scrollIntoView();", rows[-1])
 
-time.sleep(5)  # Adjust based on your connection speed and loading time
+time.sleep(8)  # Adjust based on your connection speed and loading time
 
 # Scroll until no more new data
 while True:
@@ -75,7 +73,7 @@ while True:
 
         columns = row.find_elements(By.CSS_SELECTOR, ".tablixAlignCenter")
         row_data = [column.text for column in columns]
-        print(f"[INSERT ROW DATA #{row_data[6]} OF TOTAL {total_fetched}]")
+        print(f"[INSERT ROW DATA #{row_data[6]} OF TOTAL {total_fetched} of {row_data[5]}]")
 
         total_fetched += 1
 
@@ -88,7 +86,7 @@ while True:
     # Scroll down to the bottom of the container
     driver.execute_script("arguments[0].scrollIntoView();", rows[-1])
 
-    time.sleep(0.5)  # Adjust based on your connection speed and loading time
+    time.sleep(1)  # Adjust based on your connection speed and loading time
 
     print(f"[SCROLLING FINISHED]")
 
