@@ -10,9 +10,6 @@ DEFAULT_LOAD_WAIT_TIME = 8
 SHORT_LOAD_WAIT_TIME = 3
 VERY_SHORT_LOAD_WAIT_TIME = 1
 
-CITY_DROPDOWN_INDEX = 3
-TYPE_OF_PROPERTY_DROPDOWN_INDEX = 4
-
 driver = webdriver.Chrome()
 
 print("[LOADING URL]")
@@ -24,14 +21,30 @@ time.sleep(DEFAULT_LOAD_WAIT_TIME)
 # Open table tab of the data
 driver.find_element(By.CSS_SELECTOR, "#pvExplorationHost > div > div > exploration > div > explore-canvas > div > div.canvasFlexBox > div > div.displayArea.disableAnimations.fitToPage > div.visualContainerHost.visualContainerOutOfFocus > visual-container-repeat > visual-container-group:nth-child(2) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container-group:nth-child(5) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container-group:nth-child(2) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container:nth-child(2) > transform > div > div.visualContent > div > div > visual-modern").click()
 
+CITY_DROPDOWN_ELEMENT_INDEX = 3
+CITY_DROPDOWN_ELEMENT_ITEM_INDEX = 4
+
 # Pick city from the dropdown and the type of property
 drop_down_cities = driver.find_elements(By.CSS_SELECTOR, ".slicer-dropdown-menu")
-if len(drop_down_cities) >= CITY_DROPDOWN_INDEX:
-    drop_down_cities[CITY_DROPDOWN_INDEX].click()
+if len(drop_down_cities) >= CITY_DROPDOWN_ELEMENT_INDEX:
+    drop_down_cities[CITY_DROPDOWN_ELEMENT_INDEX].click()
     time.sleep(SHORT_LOAD_WAIT_TIME)
     drop_down_cities_rows = driver.find_elements(By.CSS_SELECTOR, ".slicerItemContainer")
-    if len(drop_down_cities_rows) >= TYPE_OF_PROPERTY_DROPDOWN_INDEX:
-        drop_down_cities_rows[TYPE_OF_PROPERTY_DROPDOWN_INDEX].click()
+    if len(drop_down_cities_rows) >= CITY_DROPDOWN_ELEMENT_ITEM_INDEX:
+        drop_down_cities_rows[CITY_DROPDOWN_ELEMENT_ITEM_INDEX].click()
+
+YEAR_DROPDOWN_ELEMENT_INDEX = 3
+YEAR_DROPDOWN_ELEMENT_ITEM_INDEXS = [1, 2]
+
+# Pick city from the dropdown and the type of property
+drop_down_years = driver.find_elements(By.CSS_SELECTOR, ".slicer-dropdown-menu")
+if len(drop_down_years) >= YEAR_DROPDOWN_ELEMENT_INDEX:
+    drop_down_years[YEAR_DROPDOWN_ELEMENT_INDEX].click()
+    time.sleep(SHORT_LOAD_WAIT_TIME)
+    drop_down_years = driver.find_elements(By.CSS_SELECTOR, ".slicerItemContainer")
+    for year_index in YEAR_DROPDOWN_ELEMENT_ITEM_INDEXS:
+        if len(drop_down_years) >= year_index:
+            drop_down_years[year_index].click()
 
 print("[TABLE'S ROWS LOAD WAIT]")
 time.sleep(SHORT_LOAD_WAIT_TIME)
