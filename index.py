@@ -8,6 +8,7 @@ import os
 
 DEFAULT_LOAD_WAIT_TIME = 8
 SHORT_LOAD_WAIT_TIME = 3
+VERY_SHORT_LOAD_WAIT_TIME = 1
 
 CITY_DROPDOWN_INDEX = 3
 TYPE_OF_PROPERTY_DROPDOWN_INDEX = 4
@@ -23,7 +24,7 @@ time.sleep(DEFAULT_LOAD_WAIT_TIME)
 # Open table tab of the data
 driver.find_element(By.CSS_SELECTOR, "#pvExplorationHost > div > div > exploration > div > explore-canvas > div > div.canvasFlexBox > div > div.displayArea.disableAnimations.fitToPage > div.visualContainerHost.visualContainerOutOfFocus > visual-container-repeat > visual-container-group:nth-child(2) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container-group:nth-child(5) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container-group:nth-child(2) > transform > div > div.vcGroupBody.themableBackgroundColor.themableBorderColorSolid > visual-container:nth-child(2) > transform > div > div.visualContent > div > div > visual-modern").click()
 
-# Pick city from the dropdown
+# Pick city from the dropdown and the type of property
 drop_down_cities = driver.find_elements(By.CSS_SELECTOR, ".slicer-dropdown-menu")
 if len(drop_down_cities) >= CITY_DROPDOWN_INDEX:
     drop_down_cities[CITY_DROPDOWN_INDEX].click()
@@ -38,15 +39,14 @@ time.sleep(SHORT_LOAD_WAIT_TIME)
 # Element of the table
 table_container = driver.find_element(By.CSS_SELECTOR, ".mid-viewport")
 data_rows = []
+total_fetched = 0
 
 print("[SCRAPE DATA START]")
-
-total_fetched = 0
 
 rows = table_container.find_elements(By.CSS_SELECTOR, ".mid-viewport div.row")  # Update this selector if necessary
 
 for row in rows:
-        time.sleep(1)  # Adjust based on your connection speed and loading time
+        time.sleep(VERY_SHORT_LOAD_WAIT_TIME) 
 
         columns = row.find_elements(By.CSS_SELECTOR, ".tablixAlignCenter")
         row_data = [column.text for column in columns]
@@ -60,7 +60,7 @@ for row in rows:
 
 driver.execute_script("arguments[0].scrollIntoView();", rows[-1])
 
-time.sleep(8)  # Adjust based on your connection speed and loading time
+time.sleep(DEFAULT_LOAD_WAIT_TIME)  
 
 # Scroll until no more new data
 while True:
@@ -69,7 +69,6 @@ while True:
 
     # Extract data from rows, skip the header row and since the scoll stops at last row so we skip it on n+1 iteration
     for row in rows[1:]:
-
         columns = row.find_elements(By.CSS_SELECTOR, ".tablixAlignCenter")
         row_data = [column.text for column in columns]
         print(f"[INSERT ROW DATA #{row_data[6]} OF TOTAL {total_fetched} of {row_data[5]}]")
@@ -85,15 +84,12 @@ while True:
     # Scroll down to the bottom of the container
     driver.execute_script("arguments[0].scrollIntoView();", rows[-1])
 
-    time.sleep(1)  # Adjust based on your connection speed and loading time
-
-    print(f"[SCROLLING FINISHED]")
+    time.sleep(VERY_SHORT_LOAD_WAIT_TIME)  # Adjust based on your connection speed and loading time
 
     # Check if new rows are loaded by comparing number of rows before and after scroll
     new_rows = table_container.find_elements(By.CSS_SELECTOR, "table_viewport_container")
 
-    if len(new_rows) == len(rows):
-        # If no new rows are loaded, break the loop
+    if len(new_rows) == 0:
         break
 
 # Close the WebDriver
