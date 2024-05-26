@@ -7,6 +7,7 @@ import os
 
 
 DEFAULT_LOAD_WAIT_TIME = 8
+MEDIUM_LOAD_WAIT_TIME = 5
 SHORT_LOAD_WAIT_TIME = 3
 VERY_SHORT_LOAD_WAIT_TIME = 1
 
@@ -33,18 +34,18 @@ if len(drop_down_cities) >= CITY_DROPDOWN_ELEMENT_INDEX:
     if len(drop_down_cities_rows) >= CITY_DROPDOWN_ELEMENT_ITEM_INDEX:
         drop_down_cities_rows[CITY_DROPDOWN_ELEMENT_ITEM_INDEX].click()
 
-YEAR_DROPDOWN_ELEMENT_INDEX = 3
+YEAR_DROPDOWN_ELEMENT_INDEX = 0
 YEAR_DROPDOWN_ELEMENT_ITEM_INDEXS = [1, 2]
 
 # Pick city from the dropdown and the type of property
 drop_down_years = driver.find_elements(By.CSS_SELECTOR, ".slicer-dropdown-menu")
 if len(drop_down_years) >= YEAR_DROPDOWN_ELEMENT_INDEX:
     drop_down_years[YEAR_DROPDOWN_ELEMENT_INDEX].click()
-    time.sleep(SHORT_LOAD_WAIT_TIME)
-    drop_down_years = driver.find_elements(By.CSS_SELECTOR, ".slicerItemContainer")
+    time.sleep(MEDIUM_LOAD_WAIT_TIME)
+    drop_down_years_rows = driver.find_elements(By.CSS_SELECTOR, ".slicerItemContainer")
     for year_index in YEAR_DROPDOWN_ELEMENT_ITEM_INDEXS:
-        if len(drop_down_years) >= year_index:
-            drop_down_years[year_index].click()
+        if len(drop_down_years_rows) >= year_index:
+            drop_down_years_rows[year_index].click()
 
 print("[TABLE'S ROWS LOAD WAIT]")
 time.sleep(SHORT_LOAD_WAIT_TIME)
@@ -63,7 +64,7 @@ for row in rows:
 
         columns = row.find_elements(By.CSS_SELECTOR, ".tablixAlignCenter")
         row_data = [column.text for column in columns]
-        print(f"[INSERT ROW DATA #{row_data[6]} OF TOTAL {total_fetched}]")
+        print(f"[INSERT ROW DATA #{row_data[6]} OF TOTAL {total_fetched} of {row_data[5]}]")
 
         total_fetched += 1
 
@@ -101,9 +102,6 @@ while True:
 
     # Check if new rows are loaded by comparing number of rows before and after scroll
     new_rows = table_container.find_elements(By.CSS_SELECTOR, "table_viewport_container")
-
-    if len(new_rows) == 0:
-        break
 
 # Close the WebDriver
 driver.quit()
